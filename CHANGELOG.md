@@ -4,13 +4,9 @@ All notable changes to the OS Diablo governance and documentation repository are
 
 ## Unreleased
 
-- Recorded the v0.4.1 candidate performance/logic-validation review and artifact hash; added PERF-01 to track integration into the canonical application source repository and completion of blocked release gates.
-- Expanded synchronization to 21 backlog tasks and GitHub Issues #2–#22; the new candidate review maps to release verification and model-evaluation findings.
-
+- Refreshed the v0.4.1 candidate review after stricter model-score evidence validation, typed `outcome_unknown` propagation, outbound URL/route validation, and secret-aware package exclusions.
+- Recorded the exact local candidate checksums: source ZIP `8ccf53b1b44f793eeca833c935985c9444c54ae8313fc5af000188a04b29ab18`; bundle `3dbb83ae10b82f80ba9fba0ea694f7b2f0aefa0579f2a466906626f9f1584327`. Binary artifacts remain in the conversation delivery, not this repository.
+- Added PERF-01 (Issue #22) to integrate and verify the candidate in a canonical application-source repository and complete blocked release gates.
+- Expanded synchronization to 21 backlog tasks and GitHub Issues #2–#22; added finding-to-task and candidate-to-release-gate traceability.
 - Added a dependency-free consistency validator and GitHub Actions workflow for backlog-to-issue links, live issue state, and finding traceability.
-- Synchronized all 20 stable backlog task IDs with GitHub Issues #2–#21 and added a finding-to-task traceability map.
-- Updated the canonical backlog, documentation index and README with live issue links; no application implementation is claimed by this documentation sync.
-- Bootstrapped the repository and established a documentation-first structure.
-- Added the 2026-10-24 assessment of the business-management-assistant-ai v0.4.0 release candidate.
-- Added a findings register, implementation backlog, architecture baseline, threat model, release verification runbook, quality matrix, ADR, and contribution templates.
-- Distinguished source-code observations from checks that still require a dependency-enabled environment or live services.
+- Bootstrapped the repository with the v0.4.0 release-candidate assessment, findings register, implementation backlog, architecture baseline, threat model, runbooks, quality matrix, ADR and contribution templates.
