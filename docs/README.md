@@ -5,11 +5,12 @@ This repository is the documentation, architecture, planning, and governance lay
 ## Start here
 
 - [v0.4.0 release-candidate review](assessments/2026-10-24-v0.4.0-review.md) — scope, verified observations, limits, and conclusions.
+- [v0.4.1 performance review](assessments/2026-10-24-v0.4.1-performance-review.md) — ranking benchmark, logic-validation changes, artifact hash, and blocked release gates.
 - [Findings register](assessments/findings-register.md) — prioritized technical and operational risks.
 - [Current-state architecture](architecture/current-state.md) — what exists versus what is planned.
 - [Threat model](security/threat-model.md) — trust boundaries, threats, and required controls.
 - [Implementation backlog](roadmap/implementation-backlog.md) — stable task IDs and acceptance criteria.
-- [Backlog-to-issue map](roadmap/issue-map.md) — GitHub issue links and finding-to-task traceability for all 20 tasks.
+- [Backlog-to-issue map](roadmap/issue-map.md) — GitHub issue links and finding-to-task traceability for all 21 tasks.
 - [Milestones](roadmap/milestones.md) — proposed delivery sequence and exit gates.
 - [Release verification runbook](operations/release-verification.md) — repeatable checks for the candidate.
 - [Production-readiness checklist](operations/production-readiness-checklist.md) — minimum controls before a real deployment.
