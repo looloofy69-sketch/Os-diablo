@@ -39,7 +39,7 @@ This file is the synchronization index between the canonical Markdown backlog, f
 | F-03 — incomplete release verification | REL-01, PERF-01 |
 | F-04 — key lifecycle | AUTH-01 |
 | F-05 — coarse-grained authorization | AUTH-01 |
-| F-06 — multi-step recovery | WF-01, WF-02 |
+| F-06 — multi-step recovery and ambiguous outcomes | WF-01, WF-02, PERF-01 |
 | F-07 — integration catalog vs implementation | INT-01 |
 | F-08 — unverified integration health/delivery | INT-01 |
 | F-09 — disaster recovery | OPS-01 |
