@@ -6,6 +6,8 @@
 
 Severity definitions: **P0** release/security gate; **P1** required for dependable pilot operations; **P2** substantial capability or maintainability improvement; **P3** later enhancement or intentionally deferred scope.
 
+**Tracking:** All 22 findings map to one or more of the 20 backlog tasks. See the [backlog-to-issue synchronization map](../roadmap/issue-map.md) for task IDs and live GitHub Issues.
+
 | ID | Severity | Finding | Evidence/status | Required follow-up |
 | --- | --- | --- | --- | --- |
 | F-01 | P0 | Sandbox open mode is hazardous if exposed | Confirmed by security code: no keys means admin open mode in sandbox; Compose defaults to sandbox | Add deployment guardrails and negative tests; reject unsafe public/non-loopback deployment combinations where detectable |
