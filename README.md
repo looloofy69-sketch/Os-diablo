@@ -17,8 +17,10 @@ The initial documentation baseline is merged into `main`; outstanding applicatio
 
 - [Documentation index](docs/README.md)
 - [Assessment and findings](docs/assessments/2026-10-24-v0.4.0-review.md)
+- [v0.4.1 performance review](docs/assessments/2026-10-24-v0.4.1-performance-review.md)
 - [Findings register](docs/assessments/findings-register.md)
 - [Prioritized implementation backlog](docs/roadmap/implementation-backlog.md)
+- [GitHub issue map](docs/roadmap/issue-map.md) — 21 tracked tasks
 - [GitHub issue map](docs/roadmap/issue-map.md)
 - [Release verification runbook](docs/operations/release-verification.md)
 - [Threat model](docs/security/threat-model.md)
