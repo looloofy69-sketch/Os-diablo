@@ -1,7 +1,7 @@
 name: Engineering task
 description: Propose a scoped engineering or documentation task with evidence-based acceptance criteria
 title: "[TASK] "
-labels: ["task"]
+labels: ["enhancement"]
 body:
   - type: input
     id: backlog_id
