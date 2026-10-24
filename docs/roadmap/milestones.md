@@ -1,6 +1,6 @@
 # Proposed Delivery Milestones
 
-The sequence below is a dependency-aware proposal, not a commitment to dates. Task IDs link to live issues through the [backlog-to-issue map](issue-map.md).
+The sequence below is a dependency-aware proposal, not a commitment to dates. Task IDs link to live issues through the [backlog-to-issue map](issue-map.md). The v0.4.1 candidate must pass the PERF-01 integration gate before its local artifact can be considered for the canonical application release.
 
 ## M0 — Verify the actual baseline
 **Exit gate:** Exact source SHA known; tests and migration/Docker checks recorded; open P0 findings visible; release disposition documented.
