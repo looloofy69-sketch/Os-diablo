@@ -20,10 +20,18 @@ Proposed -> Ready -> In progress -> In review -> Verified -> Done.
 
 A task is Ready only when its scope, dependencies, owner or responsible role, and acceptance criteria are explicit. Verified requires evidence appropriate to the task. A documentation-only change must not be described as an implementation change.
 
+## Backlog synchronization check
+
+Run the local consistency check before submitting changes to the backlog, findings register, issue map, or related workflow:
+
+    python3 scripts/check_backlog_sync.py
+
+When `GITHUB_TOKEN` is set, the script additionally verifies that each mapped Issue exists, its title contains the task ID, its body links to the canonical backlog, and its live state matches the issue-map status. GitHub Actions runs this check on relevant pushes and pull requests and once per day.
+
 ## Definition of done
 
 - Requirements and acceptance criteria are satisfied.
 - Tests or verification steps are recorded.
 - Security, privacy, failure and migration impacts are documented.
 - Operator-facing changes include relevant runbooks.
-- README, backlog, findings register and changelog references are updated where needed.
+- README, backlog, issue map, findings register and changelog references are updated where needed.
