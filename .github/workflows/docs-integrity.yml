@@ -14,6 +14,9 @@ on:
   pull_request:
     paths:
       - "README.md"
+      - "CHANGELOG.md"
+      - "CONTRIBUTING.md"
+      - "SECURITY.md"
       - "docs/**"
       - "scripts/check_backlog_sync.py"
       - ".github/workflows/docs-integrity.yml"
