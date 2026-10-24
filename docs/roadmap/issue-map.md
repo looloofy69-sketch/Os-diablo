@@ -16,6 +16,7 @@ This file is the synchronization index between the canonical Markdown backlog, f
 | OBS-01 | P1 | Operational observability and alerts | [#9](https://github.com/looloofy69-sketch/Os-diablo/issues/9) | Open |
 | AUD-01 | P1 | Independently anchor audit-chain evidence | [#10](https://github.com/looloofy69-sketch/Os-diablo/issues/10) | Open |
 | AI-01 | P1 | Expand model evaluation and regression gates | [#11](https://github.com/looloofy69-sketch/Os-diablo/issues/11) | Open |
+| PERF-01 | P1 | Integrate and verify v0.4.1 performance/logic-validation candidate | [#22](https://github.com/looloofy69-sketch/Os-diablo/issues/22) | Open / source-repo integration and release gates pending |
 | INT-01 | P1 | Connector capability and delivery lifecycle | [#12](https://github.com/looloofy69-sketch/Os-diablo/issues/12) | Open |
 | DB-01 | P1 | Migration and data lifecycle policy | [#13](https://github.com/looloofy69-sketch/Os-diablo/issues/13) | Open |
 | AUTH-01 | P2 | Identity and API-key lifecycle management | [#14](https://github.com/looloofy69-sketch/Os-diablo/issues/14) | Open |
@@ -27,7 +28,7 @@ This file is the synchronization index between the canonical Markdown backlog, f
 | TEN-01 | P2 | Prove tenant isolation before shared hosting | [#20](https://github.com/looloofy69-sketch/Os-diablo/issues/20) | Open / explicitly deferred |
 | SAFE-01 | P3 | Separate gateway for irreversible financial/legal actions | [#21](https://github.com/looloofy69-sketch/Os-diablo/issues/21) | Open / explicitly deferred |
 
-**Coverage:** 20 backlog tasks have corresponding GitHub Issues. Issue #1 is the merged documentation PR; task issues are #2–#21.
+**Coverage:** 21 backlog tasks have corresponding GitHub Issues. Issue #1 is the merged documentation PR; task issues are #2–#22.
 
 ## Finding-to-task traceability
 
@@ -35,7 +36,7 @@ This file is the synchronization index between the canonical Markdown backlog, f
 | --- | --- |
 | F-01 — unsafe sandbox exposure | SEC-01 |
 | F-02 — hosted-model data egress | SEC-02 |
-| F-03 — incomplete release verification | REL-01 |
+| F-03 — incomplete release verification | REL-01, PERF-01 |
 | F-04 — key lifecycle | AUTH-01 |
 | F-05 — coarse-grained authorization | AUTH-01 |
 | F-06 — multi-step recovery | WF-01, WF-02 |
@@ -43,7 +44,7 @@ This file is the synchronization index between the canonical Markdown backlog, f
 | F-08 — unverified integration health/delivery | INT-01 |
 | F-09 — disaster recovery | OPS-01 |
 | F-10 — independent audit trust anchor | AUD-01 |
-| F-11 — small model evaluation set | AI-01 |
+| F-11 — small model evaluation set | AI-01, PERF-01 |
 | F-12 — observability and alerting | OBS-01 |
 | F-13 — deletion/archive/retention lifecycle | DB-01 |
 | F-14 — migration evolution | DB-01 |
