@@ -1,0 +1,52 @@
+name: Engineering task
+description: Propose a scoped engineering or documentation task with evidence-based acceptance criteria
+title: "[TASK] "
+labels: ["task"]
+body:
+  - type: input
+    id: backlog_id
+    attributes:
+      label: Backlog ID
+      description: Stable ID such as SEC-01, WF-02, or AI-01. Use N/A for a new candidate.
+      placeholder: SEC-01
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Intended outcome
+      description: What observable result should change?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Write testable criteria and required evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and risks
+      description: Include migrations, security, data, operations and external services.
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Verification evidence
+      description: Add test commands, expected results or CI links. Leave blank while proposed.
+    validations:
+      required: false
