@@ -2,8 +2,8 @@
 """Check consistency between the canonical backlog, issue map and live GitHub issues.
 
 Local mode validates repository documents without dependencies or network access.
-When GITHUB_TOKEN is set, it also verifies that each mapped issue exists, its
-title contains the corresponding task ID, and its body links back to the backlog.
+When GITHUB_TOKEN is set, it also verifies every mapped issue's title, state and
+backlink to the canonical backlog.
 """
 from __future__ import annotations
 
@@ -21,7 +21,8 @@ ISSUE_MAP_PATH = ROOT / "docs" / "roadmap" / "issue-map.md"
 TASK_RE = re.compile(r"^###\s+([A-Z]{2,6}-\d{2})\s+—", re.MULTILINE)
 MAP_ROW_RE = re.compile(
     r"^\|\s*([A-Z]{2,6}-\d{2})\s*\|\s*P[0-3]\s*\|[^|]*"
-    r"\|\s*\[#(\d+)\]\((https://github\.com/([^/]+/[^/]+)/issues/(\d+))\)\s*\|",
+    r"\|\s*\[#(\d+)\]\((https://github\.com/([^/]+/[^/]+)/issues/(\d+))\)\s*"
+    r"\|\s*([^|]+)\|\s*$",
     re.MULTILINE,
 )
 FINDING_ROW_RE = re.compile(
@@ -41,7 +42,9 @@ def unique_ids(values: list[str], label: str) -> set[str]:
     return set(values)
 
 
-def check_live_issue(repo: str, number: int, task_id: str, token: str) -> None:
+def check_live_issue(
+    repo: str, number: int, task_id: str, expected_status: str, token: str
+) -> None:
     url = f"https://api.github.com/repos/{repo}/issues/{number}"
     request = urllib.request.Request(
         url,
@@ -66,8 +69,25 @@ def check_live_issue(repo: str, number: int, task_id: str, token: str) -> None:
     body = issue.get("body") or ""
     if "docs/roadmap/implementation-backlog.md" not in body:
         fail(f"issue #{number} does not link back to the canonical backlog")
-    if issue.get("state") not in {"open", "closed"}:
-        fail(f"issue #{number} has an unexpected state")
+
+    actual_state = issue.get("state")
+    expected = expected_status.strip().lower()
+    if expected.startswith("open") and actual_state != "open":
+        fail(
+            f"{task_id} map status says {expected_status!r}, "
+            f"but issue #{number} is {actual_state!r}; update the issue map"
+        )
+    if (expected.startswith("closed") or expected.startswith("done")) and actual_state != "closed":
+        fail(
+            f"{task_id} map status says {expected_status!r}, "
+            f"but issue #{number} is {actual_state!r}; update the issue map"
+        )
+    if not (
+        expected.startswith("open")
+        or expected.startswith("closed")
+        or expected.startswith("done")
+    ):
+        fail(f"{task_id} has unsupported issue-map status {expected_status!r}")
 
 
 def main() -> None:
@@ -77,8 +97,7 @@ def main() -> None:
     backlog = BACKLOG_PATH.read_text(encoding="utf-8")
     issue_map = ISSUE_MAP_PATH.read_text(encoding="utf-8")
 
-    backlog_list = TASK_RE.findall(backlog)
-    backlog_ids = unique_ids(backlog_list, "backlog")
+    backlog_ids = unique_ids(TASK_RE.findall(backlog), "backlog")
     rows = MAP_ROW_RE.findall(issue_map)
     map_ids = [row[0] for row in rows]
     map_id_set = unique_ids(map_ids, "issue map")
@@ -94,12 +113,18 @@ def main() -> None:
         fail("an Issue number is mapped to more than one task")
 
     repo = os.environ.get("GITHUB_REPOSITORY", "looloofy69-sketch/Os-diablo")
-    for task_id, number_text, url, url_repo, url_number in rows:
+    for task_id, number_text, url, url_repo, url_number, status in rows:
         number = int(number_text)
         if url_repo.lower() != repo.lower():
             fail(f"{task_id} points to {url_repo}, expected {repo}")
         if int(url_number) != number:
             fail(f"{task_id} Issue link number disagrees with table number")
+        if not (
+            status.strip().lower().startswith("open")
+            or status.strip().lower().startswith("closed")
+            or status.strip().lower().startswith("done")
+        ):
+            fail(f"{task_id} has unsupported status {status!r}")
         heading_link = re.search(
             rf"^\*\*GitHub issue:\*\*\s+\[{re.escape(task_id)}\]\({re.escape(url)}\)\s*$",
             backlog,
@@ -109,9 +134,7 @@ def main() -> None:
             fail(f"{task_id} is not linked to its Issue from the backlog")
 
     finding_rows = FINDING_ROW_RE.findall(issue_map)
-    finding_ids = [row[0] for row in finding_rows]
-    unique_ids(finding_ids, "finding map")
-    mapped_finding_ids: set[str] = set()
+    finding_ids = unique_ids([row[0] for row in finding_rows], "finding map")
     for finding_id, task_text in finding_rows:
         linked_tasks = set(re.findall(r"\b[A-Z]{2,6}-\d{2}\b", task_text))
         if not linked_tasks:
@@ -119,19 +142,18 @@ def main() -> None:
         unknown = linked_tasks - backlog_ids
         if unknown:
             fail(f"{finding_id} maps to unknown task IDs: {sorted(unknown)}")
-        mapped_finding_ids.add(finding_id)
-    if len(mapped_finding_ids) != 22:
-        fail(f"expected 22 findings in baseline map, found {len(mapped_finding_ids)}")
+    if len(finding_ids) != 22:
+        fail(f"expected 22 findings in baseline map, found {len(finding_ids)}")
 
     token = os.environ.get("GITHUB_TOKEN")
     if token:
-        for task_id, number_text, _url, _url_repo, _url_number in rows:
-            check_live_issue(repo, int(number_text), task_id, token)
+        for task_id, number_text, _url, _url_repo, _url_number, status in rows:
+            check_live_issue(repo, int(number_text), task_id, status, token)
         print(f"PASS: documents match; {len(rows)} live GitHub Issues verified.")
     else:
         print(
-            f"PASS: documents match ({len(backlog_ids)} tasks, "
-            f"{len(mapped_finding_ids)} findings, {len(issue_numbers)} unique Issue links). "
+            f"PASS: documents match ({len(backlog_ids)} tasks, {len(finding_ids)} findings, "
+            f"{len(issue_numbers)} unique Issue links). "
             "Set GITHUB_TOKEN to include live Issue verification."
         )
 
