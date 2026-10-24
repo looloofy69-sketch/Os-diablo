@@ -106,6 +106,24 @@ This is the canonical prioritized task list for the reviewed v0.4.0 baseline. ID
 - Report graded coverage, accuracy, latency and cost where available.
 - Establish minimum confidence/score and regression thresholds; low evidence means manual approval or rules path.
 
+### PERF-01 — Integrate and verify the v0.4.1 performance/logic-validation candidate
+
+**GitHub issue:** [PERF-01](https://github.com/looloofy69-sketch/Os-diablo/issues/22)
+
+**Outcome:** The candidate's ranking and validation changes are integrated into the canonical application source repository and verified on a specific commit.
+
+**Acceptance criteria:**
+- Identify the canonical application source repository and record its source/base commit.
+- Compare the candidate ZIP with that source and review a small, explainable diff rather than blindly replacing files.
+- Retain regression coverage for top-k equivalence, endpoint/model-pool validation, evaluation sample gates, duplicate-tool scoring, redirects, ambiguous connector outcomes, and package exclusions.
+- Run the dependency-backed API suite, Ruff, PostgreSQL migration/upgrade tests, and Docker build/start in connected CI.
+- Run controlled model evaluation, SMTP-catcher tests, and signed-webhook tests; record the models/services actually exercised.
+- Preserve benchmark methodology and the synthetic-only qualification; add database/API load measurements before making end-to-end performance claims.
+- Update application source version, changelog, release package, and checksums only after the accepted changes are in the application repository.
+- Do not tag or deploy as production-ready while mandatory checks remain blocked or unrun.
+
+**Current limitation:** the v0.4.1 source ZIP has been prepared and locally tested, but it has not been integrated into an identified application-source repository or deployed.
+
 ### INT-01 — Define connector capability and delivery lifecycle
 
 **GitHub issue:** [INT-01](https://github.com/looloofy69-sketch/Os-diablo/issues/12)
