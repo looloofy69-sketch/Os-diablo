@@ -1,6 +1,6 @@
 # Proposed Delivery Milestones
 
-The sequence below is a dependency-aware proposal, not a commitment to dates.
+The sequence below is a dependency-aware proposal, not a commitment to dates. Task IDs link to live issues through the [backlog-to-issue map](issue-map.md).
 
 ## M0 — Verify the actual baseline
 **Exit gate:** Exact source SHA known; tests and migration/Docker checks recorded; open P0 findings visible; release disposition documented.
