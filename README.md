@@ -11,7 +11,7 @@ OS Diablo is the documentation, architecture, delivery-planning, and governance 
 
 ## Status
 
-The first documentation baseline is being established. The initial assessment is based on the supplied v0.4.0 archive and static code review dated 2026-10-24. It is not evidence that live model providers, SMTP, Slack, webhooks, PostgreSQL migrations, or Docker have been validated end-to-end.
+The initial documentation baseline is merged into `main`; outstanding application work remains tracked as GitHub Issues and is not complete merely because it is documented. The initial assessment is based on the supplied v0.4.0 archive and static code review dated 2026-10-24. It is not evidence that live model providers, SMTP, Slack, webhooks, PostgreSQL migrations, or Docker have been validated end-to-end.
 
 ## Start here
 
@@ -19,6 +19,7 @@ The first documentation baseline is being established. The initial assessment is
 - [Assessment and findings](docs/assessments/2026-10-24-v0.4.0-review.md)
 - [Findings register](docs/assessments/findings-register.md)
 - [Prioritized implementation backlog](docs/roadmap/implementation-backlog.md)
+- [GitHub issue map](docs/roadmap/issue-map.md)
 - [Release verification runbook](docs/operations/release-verification.md)
 - [Threat model](docs/security/threat-model.md)
 
