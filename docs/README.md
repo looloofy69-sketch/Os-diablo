@@ -9,6 +9,7 @@ This repository is the documentation, architecture, planning, and governance lay
 - [Current-state architecture](architecture/current-state.md) — what exists versus what is planned.
 - [Threat model](security/threat-model.md) — trust boundaries, threats, and required controls.
 - [Implementation backlog](roadmap/implementation-backlog.md) — stable task IDs and acceptance criteria.
+- [Backlog-to-issue map](roadmap/issue-map.md) — GitHub issue links and finding-to-task traceability for all 20 tasks.
 - [Milestones](roadmap/milestones.md) — proposed delivery sequence and exit gates.
 - [Release verification runbook](operations/release-verification.md) — repeatable checks for the candidate.
 - [Production-readiness checklist](operations/production-readiness-checklist.md) — minimum controls before a real deployment.
