@@ -83,6 +83,58 @@ jobs:
           fi
           docker rm -f bma-ci
 
+      - name: Compose staging smoke with PostgreSQL persistence
+        working-directory: business-management-assistant-ai
+        shell: bash
+        run: |
+          set -euo pipefail
+          api_key="bma-ci-secret-0123456789abcdef"
+          cleanup() {
+            docker compose down -v --remove-orphans || true
+            rm -f .env
+          }
+          trap cleanup EXIT
+          printf 'ENVIRONMENT=staging\nAPI_KEYS=ciadmin:admin:%s\nPOSTGRES_PASSWORD=ci-postgres-password\n' "$api_key" > .env
+          docker compose config --quiet
+          docker compose up -d --build
+          ready=0
+          for _ in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:8000/ready >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker compose ps
+            docker compose logs --no-color
+            exit 1
+          fi
+          curl --silent --show-error --fail http://127.0.0.1:8000/health
+          curl --silent --show-error --fail http://127.0.0.1:8000/ | grep -q "Business Assistant"
+          curl --silent --show-error --fail http://127.0.0.1:8000/static/app.js | grep -q "api-key"
+          curl --silent --show-error --fail -H "X-API-Key: $api_key" \
+            -H "content-type: application/json" \
+            -d '{"title":"Compose persistence smoke goal"}' \
+            http://127.0.0.1:8000/api/goals | grep -q "Compose persistence smoke goal"
+          docker compose restart api
+          ready=0
+          for _ in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:8000/ready >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker compose logs --no-color api
+            exit 1
+          fi
+          curl --silent --show-error --fail -H "X-API-Key: $api_key" \
+            "http://127.0.0.1:8000/api/goals?limit=200" | grep -q "Compose persistence smoke goal"
+          curl --silent --show-error --fail -H "X-API-Key: $api_key" \
+            http://127.0.0.1:8000/api/audit/verify | python -c 'import json,sys; assert json.load(sys.stdin)["ok"] is True'
+
   postgres:
     runs-on: ubuntu-latest
     services:
