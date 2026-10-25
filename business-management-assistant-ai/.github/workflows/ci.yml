@@ -1,0 +1,53 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: pytest -q
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://test:test@localhost:5432/test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,postgres]"
+      - run: pytest -q
+      - name: Migrations apply to an empty database
+        run: |
+          python - <<'PY'
+          from sqlalchemy import create_engine, text
+          from sqlmodel import SQLModel
+          e = create_engine("${{ env.TEST_DATABASE_URL }}")
+          SQLModel.metadata.drop_all(e)
+          with e.begin() as c:
+              c.execute(text("DROP TABLE IF EXISTS alembic_version"))
+          PY
+          DATABASE_URL="${{ env.TEST_DATABASE_URL }}" alembic upgrade head

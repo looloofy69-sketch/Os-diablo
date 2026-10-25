@@ -1,0 +1,180 @@
+name: Application CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "business-management-assistant-ai/**"
+      - ".github/workflows/application-ci.yml"
+  pull_request:
+    paths:
+      - "business-management-assistant-ai/**"
+      - ".github/workflows/application-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: business-management-assistant-ai
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: business-management-assistant-ai/pyproject.toml
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check .
+      - name: Test
+        run: pytest -q
+
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Build application image
+        run: docker build -t business-management-assistant-ai:ci ./business-management-assistant-ai
+      - name: Start sandbox container and check readiness
+        run: |
+          docker run -d --name bma-ci -p 127.0.0.1:8000:8000 business-management-assistant-ai:ci
+          ready=0
+          for _ in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/health >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker logs bma-ci
+            exit 1
+          fi
+          curl --silent --show-error --fail http://127.0.0.1:8000/ready
+      - name: Verify container health check
+        run: |
+          healthy=0
+          for _ in $(seq 1 30); do
+            status="$(docker inspect --format='{{.State.Health.Status}}' bma-ci)"
+            if [ "$status" = "healthy" ]; then
+              healthy=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$healthy" -ne 1 ]; then
+            docker inspect bma-ci
+            docker logs bma-ci
+            exit 1
+          fi
+          docker rm -f bma-ci
+
+      - name: Compose staging smoke with PostgreSQL persistence
+        working-directory: business-management-assistant-ai
+        shell: bash
+        run: |
+          set -euo pipefail
+          api_key="bma-ci-secret-0123456789abcdef"
+          cleanup() {
+            docker compose down -v --remove-orphans || true
+            rm -f .env
+          }
+          trap cleanup EXIT
+          printf 'ENVIRONMENT=staging\nAPI_KEYS=ciadmin:admin:%s\nPOSTGRES_PASSWORD=ci-postgres-password\n' "$api_key" > .env
+          docker compose config --quiet
+          docker compose up -d --build
+          ready=0
+          for _ in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:8000/ready >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker compose ps
+            docker compose logs --no-color
+            exit 1
+          fi
+          curl --silent --show-error --fail http://127.0.0.1:8000/health
+          curl --silent --show-error --fail http://127.0.0.1:8000/ | grep -q "Business Assistant"
+          curl --silent --show-error --fail http://127.0.0.1:8000/static/app.js | grep -q "api-key"
+          curl --silent --show-error --fail -H "X-API-Key: $api_key" \
+            -H "content-type: application/json" \
+            -d '{"title":"Compose persistence smoke goal"}' \
+            http://127.0.0.1:8000/api/goals | grep -q "Compose persistence smoke goal"
+          docker compose restart api
+          ready=0
+          for _ in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:8000/ready >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker compose logs --no-color api
+            exit 1
+          fi
+          curl --silent --show-error --fail -H "X-API-Key: $api_key" \
+            "http://127.0.0.1:8000/api/goals?limit=200" | grep -q "Compose persistence smoke goal"
+          curl --silent --show-error --fail -H "X-API-Key: $api_key" \
+            http://127.0.0.1:8000/api/audit/verify | python -c 'import json,sys; assert json.load(sys.stdin)["ok"] is True'
+
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://test:test@localhost:5432/test
+    defaults:
+      run:
+        working-directory: business-management-assistant-ai
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: business-management-assistant-ai/pyproject.toml
+      - name: Install development and PostgreSQL dependencies
+        run: python -m pip install -e ".[dev,postgres]"
+      - name: Test against PostgreSQL
+        run: pytest -q
+      - name: Apply migrations to an empty database
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+        run: |
+          python - <<'PY'
+          from sqlalchemy import create_engine, text
+          from sqlmodel import SQLModel
+          engine = create_engine("${{ env.TEST_DATABASE_URL }}")
+          SQLModel.metadata.drop_all(engine)
+          with engine.begin() as connection:
+              connection.execute(text("DROP TABLE IF EXISTS alembic_version"))
+          PY
+          alembic upgrade head

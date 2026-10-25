@@ -1,0 +1,30 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-sandbox}
+      API_KEYS: ${API_KEYS:-}
+      DATABASE_URL: "postgresql+psycopg://assistant:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your env file}@postgres:5432/assistant"
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: assistant
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in your env file}
+      POSTGRES_DB: assistant
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U assistant -d assistant"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  pgdata:

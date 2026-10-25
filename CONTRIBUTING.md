@@ -1,37 +1,43 @@
 # Contributing
 
-## Purpose
+OS Diablo contains both the Business Management Assistant AI application source and its cross-cutting architecture, security, delivery and governance records. Keep source changes, evidence and claims consistent.
 
-OS Diablo coordinates architecture, findings, priorities, verification evidence, and operational guidance for the AI-enabled business operations system. Keep this repository clearly distinguished from repositories that contain executable application code.
+## Application changes
 
-## Documentation rules
+The Python project lives under `business-management-assistant-ai/`.
 
-1. Label the status of each material statement: implemented, partially implemented, planned, unverified, or deferred.
-2. Record the evidence and review date for findings. Separate direct source observations from assumptions and live-environment results.
-3. Do not mark a task done based only on a written design. Link a commit, test result, CI run, or operator evidence.
-4. Any new capability should include acceptance criteria, failure behavior, security impact, data migration needs, and operational implications.
-5. Use stable task IDs from the implementation backlog, for example SEC-01 or REL-02, and keep references synchronized when task IDs change.
-6. Do not commit credentials, customer data, production logs, private endpoints, or secrets.
-7. Prefer small, reviewable pull requests. Avoid unrelated formatting or wide structural changes in a documentation update.
+```bash
+cd business-management-assistant-ai
+python -m pip install -e ".[dev]"
+ruff check .
+pytest -q
+```
 
-## Task lifecycle
+For PostgreSQL validation install `.[dev,postgres]`, set `TEST_DATABASE_URL`, run the tests, and exercise Alembic migrations against an empty database and a supported prior schema. The GitHub Actions workflow is `.github/workflows/application-ci.yml`; it is at repository root because GitHub does not execute nested `.github/workflows` directories.
 
-Proposed -> Ready -> In progress -> In review -> Verified -> Done.
+## Documentation and governance rules
 
-A task is Ready only when its scope, dependencies, owner or responsible role, and acceptance criteria are explicit. Verified requires evidence appropriate to the task. A documentation-only change must not be described as an implementation change.
+1. Label material statements as implemented, partially implemented, planned, unverified or deferred.
+2. Record evidence and review dates; distinguish code inspection from connected-CI and live-service results.
+3. Do not mark a task complete based only on a design or local unit-test pass.
+4. Include acceptance criteria, failure behavior, security impact, migration requirements and operational implications with new capabilities.
+5. Use stable task IDs from the implementation backlog and synchronize the issue map with GitHub Issues.
+6. Never commit credentials, customer data, production logs, private endpoints or secrets. `.env.example` is acceptable; real environment files and private keys are not.
+7. Prefer small, reviewable pull requests and preserve unrelated source and governance work.
 
-## Backlog synchronization check
+## Backlog synchronization
 
-Run the local consistency check before submitting changes to the backlog, findings register, issue map, or related workflow:
+Run this repository's dependency-free consistency check before changing backlog/issue-map relationships:
 
-    python3 scripts/check_backlog_sync.py
+```bash
+python3 scripts/check_backlog_sync.py
+```
 
-When `GITHUB_TOKEN` is set, the script additionally verifies that each mapped Issue exists, its title contains the task ID, its body links to the canonical backlog, and its live state matches the issue-map status. GitHub Actions runs this check on relevant pushes and pull requests and once per day.
+GitHub Actions runs this check for relevant pushes and pull requests and on a daily schedule.
 
 ## Definition of done
 
-- Requirements and acceptance criteria are satisfied.
-- Tests or verification steps are recorded.
-- Security, privacy, failure and migration impacts are documented.
-- Operator-facing changes include relevant runbooks.
-- README, backlog, issue map, findings register and changelog references are updated where needed.
+- Acceptance criteria are met with appropriate test or verification evidence.
+- Security, privacy, failure, migration and operational impacts are documented.
+- README, changelog, architecture, backlog, issue map, findings and runbooks are updated where relevant.
+- Claims about release readiness reflect the actual checks completed; do not describe blocked checks as passes.
