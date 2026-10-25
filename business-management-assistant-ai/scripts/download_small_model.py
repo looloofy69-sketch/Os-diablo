@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from app.services.local_models import get_model
@@ -34,7 +34,7 @@ def main() -> None:
     destination = Path(args.root) / model.key
     destination.mkdir(parents=True, exist_ok=True)
     snapshot_download(repo_id=model.repo_id, local_dir=str(destination), revision=args.revision)
-    manifest = {"key": model.key, "repo_id": model.repo_id, "revision": args.revision or "default-branch", "downloaded_at": datetime.now(timezone.utc).isoformat()}
+    manifest = {"key": model.key, "repo_id": model.repo_id, "revision": args.revision or "default-branch", "downloaded_at": datetime.now(UTC).isoformat()}
     (destination / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     if not args.revision:
         print("Warning: no --revision given; pin one so evaluation results stay reproducible.")

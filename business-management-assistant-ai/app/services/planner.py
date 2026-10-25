@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 MAX_STEPS = 5
@@ -111,7 +111,7 @@ def build_system_prompt(now: datetime, snapshot: str, external_types: list[str])
     tools = "\n".join(_signature(spec) for spec in TOOL_SPECS)
     return (
         "You are the planning engine of a business management assistant. Turn the user's request into tool calls.\n"
-        f"Current UTC time: {now.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M')}.\n\n"
+        f"Current UTC time: {now.astimezone(UTC).strftime('%Y-%m-%d %H:%M')}.\n\n"
         f"Tools (* = required):\n{tools}\n\n"
         f"Valid action_type values for {PROPOSE}: {', '.join(external_types)}.\n\n"
         "Rules:\n"
@@ -170,10 +170,10 @@ def parse_when(value: str) -> datetime:
     """ISO date or datetime -> aware UTC. A bare date means end of that day."""
     text = value.strip()
     if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
-        parsed = datetime.fromisoformat(text).replace(hour=23, minute=59, second=59, microsecond=999999, tzinfo=timezone.utc)
+        parsed = datetime.fromisoformat(text).replace(hour=23, minute=59, second=59, microsecond=999999, tzinfo=UTC)
     else:
         parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-        parsed = parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC) if parsed.tzinfo is None else parsed.astimezone(UTC)
     return parsed
 
 

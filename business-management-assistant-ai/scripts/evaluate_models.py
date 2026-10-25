@@ -12,7 +12,7 @@ import argparse
 import json
 import os
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from statistics import median
 from typing import Any
@@ -118,7 +118,7 @@ def main() -> int:
 
     estimated_calls = len(candidates) * len(rows)
     print(f"Evaluation plan: {len(candidates)} model(s) x {len(rows)} example(s) = up to {estimated_calls} provider calls.")
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     changed = False
     for candidate in candidates:
         client = pool.client_for(candidate)

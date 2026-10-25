@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import heapq
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 PRIORITY_WEIGHT = {"urgent": 40, "high": 30, "medium": 15, "low": 5}
 EXCLUDED = {"done", "blocked"}
@@ -23,7 +23,7 @@ class TaskView:
 def as_utc(moment: datetime | None) -> datetime | None:
     if moment is None:
         return None
-    return moment.replace(tzinfo=timezone.utc) if moment.tzinfo is None else moment.astimezone(timezone.utc)
+    return moment.replace(tzinfo=UTC) if moment.tzinfo is None else moment.astimezone(UTC)
 
 
 def score_task(task: TaskView, now: datetime) -> tuple[float, str] | None:
@@ -58,7 +58,7 @@ def rank_tasks(tasks: list[TaskView], now: datetime, limit: int = 5) -> list[tup
     """
     if limit <= 0:
         return []
-    far = datetime.max.replace(tzinfo=timezone.utc)
+    far = datetime.max.replace(tzinfo=UTC)
 
     def scored_rows():
         for task in tasks:
