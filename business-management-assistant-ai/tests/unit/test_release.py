@@ -7,7 +7,8 @@ import tempfile
 import unittest
 import zipfile
 
-from scripts.package_release import ROOT as PACKAGE_ROOT, included
+from scripts.package_release import ROOT as PACKAGE_ROOT
+from scripts.package_release import included
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
