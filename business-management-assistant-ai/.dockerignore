@@ -1,0 +1,16 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.db
+.env
+models
+tests
+data/evaluation/results.jsonl
+.pytest_cache
+.ruff_cache
+.mypy_cache
+dist
+release_artifacts
+*.log
+.DS_Store

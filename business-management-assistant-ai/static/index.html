@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Business Assistant</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">Business<br>Assistant</div>
+    <div class="pulse" id="mode"><span class="dot"></span><span id="mode-text">connecting</span></div>
+    <nav aria-label="Sections">
+      <a href="#briefing" class="active">Briefing</a>
+      <a href="#approvals">Approvals <span class="count" id="nav-approvals" hidden></span></a>
+      <a href="#work">Work</a>
+      <a href="#assistant">Assistant</a>
+      <a href="#audit" data-admin>Audit trail</a>
+      <a href="/docs" data-docs>API reference</a>
+    </nav>
+    <div class="who" id="who"></div>
+  </aside>
+
+  <main>
+    <div class="notice" id="auth-panel" hidden>
+      <form id="auth-form">
+        <label for="api-key">API key</label>
+        <input id="api-key" type="password" autocomplete="off" required>
+        <button type="submit">Connect</button>
+      </form>
+      <p id="auth-error" class="error" role="alert"></p>
+    </div>
+
+    <section id="briefing" aria-labelledby="h-briefing">
+      <h1 id="h-briefing">Make the next move obvious.</h1>
+      <p class="lede">Nothing leaves the sandbox without your approval.</p>
+      <div class="metrics" id="metrics"></div>
+      <div class="two">
+        <div><h2>Needs attention</h2><ul class="rows" id="attention"></ul></div>
+        <div><h2>Next actions</h2><ul class="rows" id="next-actions"></ul></div>
+      </div>
+      <h2>Goals</h2>
+      <ul class="rows" id="goals"></ul>
+    </section>
+
+    <section id="approvals" aria-labelledby="h-approvals">
+      <h2 id="h-approvals">Approval queue</h2>
+      <p class="lede" id="approvals-hint">Each card shows the exact payload that would be sent.</p>
+      <div id="approval-list"></div>
+    </section>
+
+    <section id="work" aria-labelledby="h-work">
+      <h2 id="h-work">Work</h2>
+      <form id="task-form" class="inline">
+        <label class="sr" for="task-title">Task title</label>
+        <input id="task-title" placeholder="New task title" required maxlength="200">
+        <label class="sr" for="task-priority">Priority</label>
+        <select id="task-priority"><option>medium</option><option>high</option><option>urgent</option><option>low</option></select>
+        <label class="sr" for="task-due">Due date</label>
+        <input id="task-due" type="date">
+        <button type="submit">Add task</button>
+      </form>
+      <div class="scroll"><table id="tasks"><thead><tr><th>Task</th><th>Priority</th><th>Due</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section id="assistant" aria-labelledby="h-assistant">
+      <h2 id="h-assistant">Assistant</h2>
+      <p class="sub" id="models-line"></p>
+      <div class="log" id="chat-log" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <form id="chat-form" class="inline">
+        <label class="sr" for="chat-input">Message</label>
+        <input id="chat-input" placeholder="Try: create task: call Alex by 2026-11-01 high priority" required maxlength="4000" autocomplete="off">
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <section id="audit" aria-labelledby="h-audit" data-admin>
+      <h2 id="h-audit">Audit trail</h2>
+      <p class="lede"><button type="button" id="verify" class="ghost">Verify chain</button> <span id="verify-result"></span></p>
+      <ul class="rows mono" id="audit-list"></ul>
+    </section>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

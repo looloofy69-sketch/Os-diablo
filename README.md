@@ -1,38 +1,38 @@
-# OS Diablo
+# OS Diablo — Business Management Assistant AI
 
-OS Diablo is the documentation, architecture, delivery-planning, and governance home for the AI-enabled business operations system. This repository starts as a documentation-first control plane; it does not claim to contain or deploy the application implementation.
+OS Diablo is the single repository for the Business Management Assistant AI application, its release artifacts and verification evidence, and the architecture/security/governance controls around it.
 
-## Initial scope
+## Application source
 
-- Record the v0.4.0 release-candidate assessment of `business-management-assistant-ai`.
-- Track confirmed observations, risks, unverified assumptions, and missing capabilities.
-- Maintain a prioritized implementation backlog with acceptance criteria.
-- Define architecture boundaries, security expectations, operational runbooks, and release gates.
+The v0.4.1 review candidate is maintained as ordinary source files under [`business-management-assistant-ai/`](business-management-assistant-ai/). Start with its [application README](business-management-assistant-ai/README.md), [release notes](business-management-assistant-ai/docs/releases/v0.4.1-release-notes.md), [validation report](business-management-assistant-ai/docs/releases/v0.4.1-performance-validation.md), and [artifact checksums](business-management-assistant-ai/docs/releases/v0.4.1-artifact-checksums.md).
 
-## Status
+The current integration is being reviewed on branch `integrate/v0.4.1-app-source`. It is not considered merged, tagged, deployed, or production-ready until CI and the remaining release gates pass. The original source ZIP SHA-256 is recorded in the release evidence; it is not a Git tree hash.
 
-The initial documentation baseline is merged into `main`; outstanding application work remains tracked as GitHub Issues and is not complete merely because it is documented. The initial assessment is based on the supplied v0.4.0 archive and static code review dated 2026-10-24. It is not evidence that live model providers, SMTP, Slack, webhooks, PostgreSQL migrations, or Docker have been validated end-to-end.
-
-## Start here
+## Governance and engineering records
 
 - [Documentation index](docs/README.md)
-- [Assessment and findings](docs/assessments/2026-10-24-v0.4.0-review.md)
+- [Current-state architecture](docs/architecture/current-state.md)
+- [v0.4.0 assessment](docs/assessments/2026-10-24-v0.4.0-review.md)
 - [v0.4.1 performance review](docs/assessments/2026-10-24-v0.4.1-performance-review.md)
+- [v0.4.1 repository integration record](docs/assessments/2026-10-25-v0.4.1-integration.md)
 - [Findings register](docs/assessments/findings-register.md)
-- [Prioritized implementation backlog](docs/roadmap/implementation-backlog.md)
-- [GitHub issue map](docs/roadmap/issue-map.md) — 21 tracked tasks
-- [GitHub issue map](docs/roadmap/issue-map.md)
+- [Implementation backlog](docs/roadmap/implementation-backlog.md)
+- [Issue map](docs/roadmap/issue-map.md)
 - [Release verification runbook](docs/operations/release-verification.md)
 - [Threat model](docs/security/threat-model.md)
 
-## Working principles
+## Local development
 
-1. Separate implemented, partially implemented, planned, and unverified capabilities.
-2. Prefer fail-closed security defaults outside a local sandbox.
-3. Never treat a unit-test pass as proof of live integration or production readiness.
-4. Every backlog item should have an owner, dependencies, acceptance criteria, and evidence of completion before it is marked done.
-5. Keep application code and this governance repository's documents clearly distinguished.
+```bash
+cd business-management-assistant-ai
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e ".[dev]"
+pytest -q
+```
 
-## Repository status
+For PostgreSQL tests, install `.[dev,postgres]` and set `TEST_DATABASE_URL`. Docker/Compose commands and runtime configuration are documented in the application README.
 
-See [CHANGELOG.md](CHANGELOG.md) for documentation changes. No deployment, repository release, or application behavior is implied by a documentation commit.
+## Status and limits
+
+The source tree and a root-level application CI workflow are being integrated; this is not proof of a successful GitHub CI run or a live deployment. Current local evidence includes 158 unit tests and 52 subtests passing. The full API suite, Ruff, PostgreSQL migration tests, Docker build/start, provider and connector delivery tests, browser E2E and realistic load remain gates to verify in connected CI or suitable test environments.
