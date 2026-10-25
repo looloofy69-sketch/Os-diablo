@@ -41,6 +41,48 @@ jobs:
       - name: Test
         run: pytest -q
 
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Build application image
+        run: docker build -t business-management-assistant-ai:ci ./business-management-assistant-ai
+      - name: Start sandbox container and check readiness
+        run: |
+          docker run -d --name bma-ci -p 127.0.0.1:8000:8000 business-management-assistant-ai:ci
+          ready=0
+          for _ in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/health >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker logs bma-ci
+            exit 1
+          fi
+          curl --silent --show-error --fail http://127.0.0.1:8000/ready
+      - name: Verify container health check
+        run: |
+          healthy=0
+          for _ in $(seq 1 30); do
+            status="$(docker inspect --format='{{.State.Health.Status}}' bma-ci)"
+            if [ "$status" = "healthy" ]; then
+              healthy=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$healthy" -ne 1 ]; then
+            docker inspect bma-ci
+            docker logs bma-ci
+            exit 1
+          fi
+          docker rm -f bma-ci
+
   postgres:
     runs-on: ubuntu-latest
     services:
