@@ -30,6 +30,7 @@ def make_settings(**overrides) -> Settings:
         "_env_file": None,
         "database_url": os.environ.get("TEST_DATABASE_URL", "sqlite://"),  # CI also runs the suite against PostgreSQL
         "rate_limit_per_minute": 0,
+        "auto_create_schema": True,  # ephemeral test database only; production runs Alembic migrations
         "llm_auto_discover": False,  # tests must never probe the network
     }
     base.update(overrides)
