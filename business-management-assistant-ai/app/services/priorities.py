@@ -72,3 +72,17 @@ def rank_tasks(tasks: list[TaskView], now: datetime, limit: int = 5) -> list[tup
         key=lambda row: (-row[0], as_utc(row[1].due_at) or far, row[1].title.lower()),
     )
     return [(task, reason) for _, task, reason in best]
+
+
+
+def goal_progress(done: int, total: int) -> float | None:
+    return None if total == 0 else done / total
+
+
+def goal_at_risk(target_date: datetime | None, progress: float | None, status: str, now: datetime, window_days: int = 14) -> bool:
+    target = as_utc(target_date)
+    if status == "done" or target is None:
+        return False
+    if target < now:
+        return progress is None or progress < 1.0
+    return (target - now).days <= window_days and (progress or 0.0) < 0.5
