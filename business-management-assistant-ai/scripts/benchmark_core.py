@@ -13,9 +13,9 @@ import platform
 import statistics
 import sys
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from collections.abc import Callable
 
 # Permit running the benchmark directly from a source checkout without editable install.
 ROOT = Path(__file__).resolve().parents[1]
