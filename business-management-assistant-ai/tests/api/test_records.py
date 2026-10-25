@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import text
 
@@ -50,10 +50,10 @@ def test_validation_and_references(client):
 
 
 def test_naive_due_date_is_utc_and_overdue_filter(client):
-    past = (datetime.now(timezone.utc) - timedelta(days=2)).replace(tzinfo=None).isoformat()
+    past = (datetime.now(UTC) - timedelta(days=2)).replace(tzinfo=None).isoformat()
     task = client.post("/api/tasks", json={"title": "late", "due_at": past}).json()
     assert task["due_at"].endswith("Z") or "+00:00" in task["due_at"]
-    client.post("/api/tasks", json={"title": "future", "due_at": (datetime.now(timezone.utc) + timedelta(days=5)).isoformat()})
+    client.post("/api/tasks", json={"title": "future", "due_at": (datetime.now(UTC) + timedelta(days=5)).isoformat()})
     assert [t["title"] for t in client.get("/api/tasks", params={"overdue": True}).json()] == ["late"]
 
 
@@ -83,7 +83,7 @@ def test_pagination_header(client):
 
 
 def test_briefing_surfaces_overdue_and_ranks_next_actions(client):
-    past = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
+    past = (datetime.now(UTC) - timedelta(days=3)).isoformat()
     client.post("/api/tasks", json={"title": "Send invoice reminder", "due_at": past})
     client.post("/api/tasks", json={"title": "Someday", "priority": "low"})
     goal = client.post("/api/goals", json={"title": "Launch"}).json()

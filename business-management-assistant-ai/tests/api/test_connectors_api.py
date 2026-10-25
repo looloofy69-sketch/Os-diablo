@@ -95,7 +95,7 @@ def test_sandbox_never_sends_even_with_smtp_configured():
         assert done["result"]["dry_run"] is True and fake.sent == []
         listing = c.get("/api/connectors").json()
         assert listing["live"] is False and listing["connectors"][0]["name"] == "smtp-email"
-        email = [i for i in c.get("/api/integrations", params={"limit": 200").json() if i["name"] == "Email"][0]
+        email = [i for i in c.get("/api/integrations", params={"limit": 200}).json() if i["name"] == "Email"][0]
         assert email["enabled"] is True and email["health"] == "sandbox_ready"
 
 
