@@ -80,7 +80,7 @@ def test_a_manipulated_model_can_only_produce_a_pending_request():
         item = c.get(f"/api/approvals/{r['approval_id']}").json()
         assert (item["status"], item["risk"], item["result"]) == ("pending", "critical", {})
         assert c.get("/api/approvals", params={"status": "executed"}).json() == []
-        assert "Ignore previous instructions" in script.calls[0]["messages"][0]["content"]
+        assert "Ignore previous instructions" in script.calls[0]["messages"][0]["content"]  # reaches the model only as snapshot data
 
 
 def test_invalid_output_is_repaired_once():
@@ -136,7 +136,7 @@ def test_failed_step_is_reported_not_raised():
     with llm_app(script) as c:
         r = say(c, "Put something about the Ghost project on my list").json()
         assert r["actions"] == [] and c.get("/api/tasks").json() == []
-        assert "Ghost" in script.calls[1]["messages"][1]["content"]
+        assert "Ghost" in script.calls[1]["messages"][1]["content"]  # the failure was handed to the composer
 
 
 def test_llm_mode_routes_everything_except_help_through_the_model():

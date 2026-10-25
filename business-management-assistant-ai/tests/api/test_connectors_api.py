@@ -160,7 +160,7 @@ def test_reviewer_can_amend_a_request_that_lacks_content_before_approving():
         assert done["status"] == "executed" and fake.sent[0][0]["Subject"] == "The deck"
         change = c.get("/api/audit", params={"event_type": "action.amended"}, headers=as_(ADMIN)).json()[0]["details"]["changes"]
         assert "payload" in change
-        assert c.post(f"/api/approvals/{item['id']}/amend", json={"reason": "x"}, headers=as_(ADMIN)).status_code == 409
+        assert c.post(f"/api/approvals/{item['id']}/amend", json={"reason": "x"}, headers=as_(ADMIN)).status_code == 409  # no longer pending
         assert c.post(f"/api/approvals/{item['id']}/amend", json={"reason": "x"}, headers=as_(OPERATOR)).status_code == 403
 
 
@@ -201,8 +201,8 @@ def test_operator_is_notified_when_a_request_needs_review():
     with live_app(FakeSMTP(), notifier=notifier) as c:
         item = propose(c)
         assert len(sent) == 1 and "message.send" in sent[0][1] and item["id"][:8] in sent[0][2]
-        assert "Hi Alex" not in sent[0][2]
-        propose(c, action_type="record.create", target="x")
+        assert "Hi Alex" not in sent[0][2]  # notices never carry the content
+        propose(c, action_type="record.create", target="x")  # policy-internal and human-originated: auto-approved, no notice
         assert len(sent) == 1
 
 
