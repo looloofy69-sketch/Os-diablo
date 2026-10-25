@@ -7,7 +7,7 @@ import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.services.llm import LLMError, normalise_label
@@ -119,7 +119,7 @@ def summarise(scores: list[RowScore], min_accuracy: float = 0.9, min_graded: int
     }
 
 
-PLAN_SYSTEM = build_system_prompt(datetime(2026, 10, 10, 9, 0, tzinfo=timezone.utc), "No records yet.", external_action_types())
+PLAN_SYSTEM = build_system_prompt(datetime(2026, 10, 10, 9, 0, tzinfo=UTC), "No records yet.", external_action_types())
 
 
 def run_dataset(complete: Callable[[str, list[dict[str, str]]], str], rows: list[dict[str, Any]]) -> tuple[list[RowScore], list[dict[str, Any]], list[float]]:

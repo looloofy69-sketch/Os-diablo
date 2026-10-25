@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 from uuid import uuid4
@@ -12,7 +12,7 @@ from sqlmodel import Field, SQLModel
 
 
 def now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def uid() -> str:
@@ -29,13 +29,13 @@ class UTCDateTime(TypeDecorator):
         if value is None:
             return None
         if value.tzinfo is None:
-            value = value.replace(tzinfo=timezone.utc)
-        return value.astimezone(timezone.utc)
+            value = value.replace(tzinfo=UTC)
+        return value.astimezone(UTC)
 
     def process_result_value(self, value: datetime | None, dialect: Any) -> datetime | None:
         if value is None:
             return None
-        return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+        return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
 
 
 def ts(nullable: bool = False, index: bool = False) -> Column:

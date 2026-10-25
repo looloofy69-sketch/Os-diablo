@@ -6,17 +6,17 @@ import hashlib
 import json
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 GENESIS_HASH = "0" * 64
 
 
 def utc_ts(moment: datetime | None = None) -> str:
-    moment = moment or datetime.now(timezone.utc)
+    moment = moment or datetime.now(UTC)
     if moment.tzinfo is None:
-        moment = moment.replace(tzinfo=timezone.utc)
-    return moment.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        moment = moment.replace(tzinfo=UTC)
+    return moment.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 def canonical_json(value: Any) -> str:

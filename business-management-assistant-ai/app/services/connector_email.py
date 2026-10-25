@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import re
 import smtplib
-import socket
 import ssl
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.message import EmailMessage
 from typing import Any
 
@@ -48,7 +47,7 @@ def parse_recipients(*values: Any) -> list[str]:
 
 def _parse_when(value: Any) -> datetime:
     parsed = datetime.fromisoformat(str(value).strip().replace("Z", "+00:00"))
-    return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
+    return parsed.replace(tzinfo=UTC) if parsed.tzinfo is None else parsed.astimezone(UTC)
 
 
 def _escape(text: str) -> str:
@@ -64,7 +63,7 @@ def build_ics(uid: str, title: str, start: datetime, end: datetime, organizer: s
     fmt = "%Y%m%dT%H%M%SZ"
     lines = [
         "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Business Assistant//EN", "METHOD:REQUEST", "BEGIN:VEVENT",
-        f"UID:{uid}", f"DTSTAMP:{(stamp or datetime.now(timezone.utc)).strftime(fmt)}",
+        f"UID:{uid}", f"DTSTAMP:{(stamp or datetime.now(UTC)).strftime(fmt)}",
         f"DTSTART:{start.strftime(fmt)}", f"DTEND:{end.strftime(fmt)}", f"SUMMARY:{_escape(title)}", f"ORGANIZER:mailto:{organizer}",
         *[f"ATTENDEE;RSVP=TRUE:mailto:{a}" for a in attendees],
     ]
@@ -158,7 +157,7 @@ class EmailConnector:
             smtp = self._factory(self.config)
         except smtplib.SMTPAuthenticationError:
             return self._fail("SMTP authentication failed; nothing was sent")
-        except (smtplib.SMTPException, OSError, socket.timeout) as exc:
+        except (smtplib.SMTPException, OSError, TimeoutError) as exc:
             return self._fail(f"could not reach the SMTP server ({type(exc).__name__}); nothing was sent", retryable=True)
         try:
             smtp.send_message(built, to_addrs=everyone)
@@ -167,7 +166,7 @@ class EmailConnector:
             return self._fail(f"SMTP server rejected the message ({exc.smtp_code}); nothing was sent", retryable=temporary)
         except smtplib.SMTPRecipientsRefused:
             return self._fail("SMTP server refused every recipient; nothing was sent")
-        except (smtplib.SMTPException, OSError, socket.timeout) as exc:
+        except (smtplib.SMTPException, OSError, TimeoutError) as exc:
             return self._fail(
                 f"connection lost while sending ({type(exc).__name__}); outcome unknown, check the mail log before retrying",
                 outcome_unknown=True,

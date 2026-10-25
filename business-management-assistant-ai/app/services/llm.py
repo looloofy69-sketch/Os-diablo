@@ -9,7 +9,7 @@ import urllib.error
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from typing import Any
 from urllib.parse import urlparse
 
@@ -110,7 +110,7 @@ def list_models(
 class CallBudget:
     """Daily cap on model calls (UTC day, per process). ``limit == 0`` disables the cap."""
 
-    def __init__(self, limit: int, today: Callable[[], date] = lambda: datetime.now(timezone.utc).date()) -> None:
+    def __init__(self, limit: int, today: Callable[[], date] = lambda: datetime.now(UTC).date()) -> None:
         self.limit = limit
         self._today = today
         self._day = today()

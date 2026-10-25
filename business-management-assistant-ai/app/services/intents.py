@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 BRIEFING = "briefing"
@@ -105,7 +105,7 @@ def _tidy(title: str) -> str:
 
 
 def _end_of_day(day: datetime) -> datetime:
-    return day.replace(hour=23, minute=59, second=0, microsecond=0, tzinfo=timezone.utc)
+    return day.replace(hour=23, minute=59, second=0, microsecond=0, tzinfo=UTC)
 
 
 def _extract_due(text: str, now: datetime) -> tuple[str, datetime | None]:
@@ -117,12 +117,12 @@ def _extract_due(text: str, now: datetime) -> tuple[str, datetime | None]:
             return text, None
         return text[: match.start()] + text[match.end():], due
     if match := _REL_DATE.search(text):
-        base = now.astimezone(timezone.utc)
+        base = now.astimezone(UTC)
         offset = 1 if match.group(1).lower() == "tomorrow" else 0
         return text[: match.start()] + text[match.end():], _end_of_day(base + timedelta(days=offset))
     if match := _IN_DATE.search(text):
         count = int(match.group(1)) * (7 if match.group(2).lower().startswith("week") else 1)
-        return text[: match.start()] + text[match.end():], _end_of_day(now.astimezone(timezone.utc) + timedelta(days=count))
+        return text[: match.start()] + text[match.end():], _end_of_day(now.astimezone(UTC) + timedelta(days=count))
     return text, None
 
 
@@ -181,7 +181,7 @@ def parse_create(kind: str, rest: str, now: datetime) -> Intent:
 
 
 def parse(text: str, now: datetime | None = None) -> Intent:
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     cleaned = _strip_prefix(_clean(text))
     if not cleaned:
         return Intent(OTHER, 0.0)
