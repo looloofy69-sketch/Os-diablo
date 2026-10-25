@@ -28,7 +28,7 @@ def test_everything_reachable_is_discovered_and_everything_else_is_reported_down
         rows = c.get("/api/ai/models", headers=as_(VIEWER)).json()["models"]
         available = {(r["endpoint"], r["model"]) for r in rows if r["model"] and r["available"]}
         assert ("ollama", "qwen3:8b") in available and ("anthropic", "claude-opus-5-5") in available
-        assert all(r["model"] != "nomic-embed-text" for r in rows)
+        assert all(r["model"] != "nomic-embed-text" for r in rows)  # embedding models are never used for chat
         down = {r["endpoint"]: r["detail"] for r in rows if r["model"] is None}
         assert {"lmstudio", "llamacpp", "local-8001"} <= set(down)
         assert c.post("/api/ai/models/refresh", headers=as_(OPERATOR)).status_code == 403
@@ -41,7 +41,7 @@ def test_models_appearing_later_are_picked_up_on_refresh():
     pool = pool_for(settings, {}, listing)
     with TestClient(create_app(settings, model_pool=pool)) as c:
         assert [r for r in c.get("/api/ai/models").json()["models"] if r["model"]] == []
-        listing["ollama"] = ["llama3.1:8b"]
+        listing["ollama"] = ["llama3.1:8b"]  # the operator starts a local server while the app is running
         rows = c.post("/api/ai/models/refresh").json()["models"]
         assert [r["model"] for r in rows if r["model"]] == ["llama3.1:8b"]
 
@@ -61,7 +61,7 @@ def test_discovered_models_actually_serve_requests_and_hosted_can_be_forbidden()
     scripts = {"ollama/qwen3:8b": local, "openai/gpt-5": hosted}
     pool = pool_for(settings, env, {"ollama": ["qwen3:8b"], "openai": ["gpt-5"]}, scripts)
     with TestClient(create_app(settings, model_pool=pool)) as c:
-        assert c.post("/api/chat", json={"message": "Thinking about pricing"}).json()["message"] == "From the hosted model."
+        assert c.post("/api/chat", json={"message": "Thinking about pricing"}).json()["message"] == "From the hosted model."  # quality ranking
     private = make_settings(llm_auto_discover=True, llm_allow_hosted=False)
     scripts = {"ollama/qwen3:8b": Script(plan("Local only.")), "openai/gpt-5": Script(plan("must not be used"))}
     pool = pool_for(private, env, {"ollama": ["qwen3:8b"], "openai": ["gpt-5"]}, scripts)
