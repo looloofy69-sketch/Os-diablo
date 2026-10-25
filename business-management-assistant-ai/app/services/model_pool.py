@@ -20,7 +20,16 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from app.services.llm import (\n    ANTHROPIC_DEFAULT_URL,\n    PROVIDERS,\n    BudgetExceeded,\n    CallBudget,\n    ChatClient,\n    LLMError,\n    LLMReply,\n    list_models,\n)
+from app.services.llm import (
+    ANTHROPIC_DEFAULT_URL,
+    PROVIDERS,
+    BudgetExceeded,
+    CallBudget,
+    ChatClient,
+    LLMError,
+    LLMReply,
+    list_models,
+)
 from app.services.netutil import is_private_host
 
 ROLES = frozenset({"plan", "compose"})

@@ -22,7 +22,6 @@ from app.domain.models import (
     ContactCreate,
     Goal,
     GoalCreate,
-    Integration,
     Project,
     ProjectCreate,
     Status,

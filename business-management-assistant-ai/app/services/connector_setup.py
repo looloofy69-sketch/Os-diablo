@@ -9,7 +9,13 @@ from typing import Any
 
 from app.core import Settings
 from app.services.connector_email import EMAIL_RE, EmailConnector, SmtpConfig, default_smtp_factory
-from app.services.connector_http import (\n    HttpPost,\n    SignedWebhookConnector,\n    SlackConnector,\n    parse_webhook_routes,\n    urllib_post,\n)
+from app.services.connector_http import (
+    HttpPost,
+    SignedWebhookConnector,
+    SlackConnector,
+    parse_webhook_routes,
+    urllib_post,
+)
 from app.services.connectors import Connector, ConnectorRegistry
 from app.services.netutil import is_private_host
 from app.services.notifier import Notifier

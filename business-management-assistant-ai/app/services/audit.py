@@ -9,7 +9,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, col, select
 
 from app.domain.models import AuditEvent
-from app.services.audit_chain import (\n    GENESIS_HASH,\n    VerifyResult,\n    compute_entry_hash,\n    normalise_details,\n    utc_ts,\n    verify_chain,\n)
+from app.services.audit_chain import (
+    GENESIS_HASH,
+    VerifyResult,
+    compute_entry_hash,
+    normalise_details,
+    utc_ts,
+    verify_chain,
+)
 
 MAX_ATTEMPTS = 25
 # Set while model-planned steps run, so every audit entry they cause says so.

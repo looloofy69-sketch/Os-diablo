@@ -7,7 +7,16 @@ from collections.abc import Mapping
 
 from app.core import Settings
 from app.services.llm import ANTHROPIC_DEFAULT_URL, CallBudget
-from app.services.model_pool import ClientFactory, EndpointConfig, Lister, ModelPool, auto_endpoints, load_scores, merge_endpoints, parse_endpoints
+from app.services.model_pool import (
+    ClientFactory,
+    EndpointConfig,
+    Lister,
+    ModelPool,
+    auto_endpoints,
+    load_scores,
+    merge_endpoints,
+    parse_endpoints,
+)
 from app.services.netutil import is_private_host
 
 

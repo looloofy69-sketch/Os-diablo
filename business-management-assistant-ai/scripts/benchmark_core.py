@@ -13,9 +13,9 @@ import platform
 import statistics
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Callable
+from collections.abc import Callable
 
 # Permit running the benchmark directly from a source checkout without editable install.
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +36,7 @@ def positive_int(value: str) -> int:
 
 
 def full_sort_reference(tasks: list[TaskView], moment: datetime, limit: int) -> list[tuple[TaskView, str]]:
-    far = datetime.max.replace(tzinfo=timezone.utc)
+    far = datetime.max.replace(tzinfo=UTC)
     scored = []
     for task in tasks:
         result = score_task(task, moment)
@@ -60,7 +60,7 @@ def run(tasks_count: int, repeats: int, limit: int = 5, warmups: int = 2) -> dic
     if tasks_count < 1 or repeats < 1 or limit < 1 or warmups < 0:
         raise ValueError("tasks_count, repeats and limit must be positive; warmups cannot be negative")
 
-    moment = datetime(2026, 10, 24, tzinfo=timezone.utc)
+    moment = datetime(2026, 10, 24, tzinfo=UTC)
     tasks = []
     for index in range(tasks_count):
         due = moment - timedelta(hours=index % 900) if index % 7 == 0 else moment + timedelta(hours=index % 500) if index % 3 == 0 else None
@@ -73,8 +73,11 @@ def run(tasks_count: int, repeats: int, limit: int = 5, warmups: int = 2) -> dic
             project_id=str(index % 200),
         ))
 
-    optimized_call = lambda: rank_tasks(tasks, moment, limit)
-    reference_call = lambda: full_sort_reference(tasks, moment, limit)
+    def optimized_call() -> list[tuple[TaskView, str]]:
+        return rank_tasks(tasks, moment, limit)
+
+    def reference_call() -> list[tuple[TaskView, str]]:
+        return full_sort_reference(tasks, moment, limit)
 
     # Warm both implementations before measurements and fail immediately on semantic drift.
     for _ in range(warmups):

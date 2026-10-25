@@ -4,8 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import SQLModel
 
-from app.core import Settings
-from app.core import build_engine
+from app.core import Settings, build_engine
 from app.main import create_app
 
 ADMIN = "a" * 32
